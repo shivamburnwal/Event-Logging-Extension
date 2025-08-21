@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         logList.appendChild(li);
       }
     } catch (err) {
-      console.error("displayLogs error:", err);
+      console.error("DisplayLogs error:", err);
       setStatus("Failed to load logs", true);
     }
   }
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       setStatus(`Download started: ${filename}`);
     } catch (err) {
-      console.error("downloadFile error:", err);
+      console.error("DownloadFile error:", err);
       setStatus("Failed to start download", true);
     }
   }
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function clearLogs() {
     chrome.storage.local.remove([STORAGE_KEY], () => {
       if (chrome.runtime.lastError) {
-        console.error("clearLogs error:", chrome.runtime.lastError);
+        console.error("ClearLogs error:", chrome.runtime.lastError);
         setStatus("Failed to clear logs", true);
       } else {
         setStatus("Logs cleared");
