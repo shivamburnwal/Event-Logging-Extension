@@ -35,50 +35,48 @@ export function redactValue(inputEl, raw) {
 }
 
 export function toCsv(rows) {
-  if (!rows?.length) return '';
-  const columns = [
-    'ts', 'event', 'url', 'title', 'pageHeader',
-    'selector', 'tag', 'id', 'class', 'name', 'type', 'role', 'ariaLabel', 'labelText', 'placeholder',
-    'value', 'checked', 'disabled', 'visible',
-    'sample', 'length', 'redacted',
-    'innerText', 'outerHTML',
-    'formSelector', 'formAction', 'formMethod',
-    'mouse_clientX', 'mouse_clientY', 'mouse_button', 'mouse_ctrl', 'mouse_alt', 'mouse_shift', 'mouse_meta',
-    'bbox_x', 'bbox_y', 'bbox_w', 'bbox_h',
-    'selected', 'sensitive'
-  ];
+  // Flatten all rows first
+  const flattenedData = rows.map(item => flattenObject(item));
 
-  function flatten(row) {
-    const merged = { ...row, ...(row.data || {}) };
+  // Collect all unique headers
+  const headers = Array.from(
+    new Set(flattenedData.flatMap(obj => Object.keys(obj)))
+  );
 
-    return {
-      ...merged,
-      formSelector: merged.parentForm?.selector ?? '',
-      formAction: merged.parentForm?.action ?? '',
-      formMethod: merged.parentForm?.method ?? '',
-      mouse_clientX: merged.mouse?.clientX ?? '',
-      mouse_clientY: merged.mouse?.clientY ?? '',
-      mouse_button: merged.mouse?.button ?? '',
-      mouse_ctrl: merged.mouse?.ctrl ?? '',
-      mouse_alt: merged.mouse?.alt ?? '',
-      mouse_shift: merged.mouse?.shift ?? '',
-      mouse_meta: merged.mouse?.meta ?? '',
-      bbox_x: merged.bbox?.x ?? '',
-      bbox_y: merged.bbox?.y ?? '',
-      bbox_w: merged.bbox?.w ?? '',
-      bbox_h: merged.bbox?.h ?? ''
-    };
+  const csvRows = [headers.join(",")]; // first row is headers
+
+  for (const obj of flattenedData) {
+    const row = headers.map(h => {
+      const val = obj[h] !== undefined ? obj[h] : "";
+      if (typeof val === "string" && (val.includes(",") || val.includes("\"") || val.includes("\n"))) {
+        return `"${val.replace(/"/g, '""')}"`;
+      }
+      return val;
+    });
+    csvRows.push(row.join(","));
   }
 
-  const esc = v => {
-    const s = v == null ? '' : String(v).replaceAll('"', '""');
-    return /[",\n]/.test(s) ? `"${s}"` : s;
-  };
+  return csvRows.join("\n");
+}
 
-  const header = columns.join(',');
-  const body = rows.map(r => {
-    const flat = flatten(r);
-    return columns.map(f => esc(flat[f])).join(',');
-  }).join('\n');
-  return header + '\n' + body;
+function flattenObject(obj, parentKey = '', res = {}) {
+  for (let key in obj) {
+    if (!obj.hasOwnProperty(key)) continue;
+    const propName = parentKey ? `${parentKey}.${key}` : key;
+
+    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+      flattenObject(obj[key], propName, res);
+    } else if (Array.isArray(obj[key])) {
+      obj[key].forEach((item, index) => {
+        if (typeof item === 'object' && item !== null) {
+          flattenObject(item, `${propName}[${index}]`, res);
+        } else {
+          res[`${propName}[${index}]`] = item;
+        }
+      });
+    } else {
+      res[propName] = obj[key];
+    }
+  }
+  return res;
 }
