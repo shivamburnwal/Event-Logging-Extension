@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browser Logger</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <h1>Browser Logger</h1>
+
+  <div id="controls">
+    <button id="viewLogs">View Logs</button>
+    <button id="downloadCSV">Download CSV</button>
+    <button id="downloadTXT">Download TXT</button>
+    <button id="clearLogs" style="background:#ffe6e6; border-color:#e5b2b2;">Clear Logs</button>
+  </div>
+
+  <div id="status"></div>
+
+  <div id="logContainer">
+    <span id="logCount">0 logs</span>
+    <ul id="logList"></ul>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

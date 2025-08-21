@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Task Mining Logger",
+  "version": "1.0",
+  "description": "Logs browser activities (tabs, clicks, inputs, etc.) for task mining and allows export as CSV or TXT.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "scripting",
+    "downloads",
+    "alarms"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "24": "icons/icon24.png",
+      "48": "icons/icon48.png",
+      "96": "icons/icon96.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["utils.js", "content.js"]
+    }
+  ],
+  "icons": {
+    "24": "icons/icon24.png",
+    "48": "icons/icon48.png",
+    "96": "icons/icon96.png"
+  },
+  "commands": {
+    "export-logs": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Export logs as CSV"
+    }
+  }
+}
