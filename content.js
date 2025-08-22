@@ -159,11 +159,16 @@ window.addEventListener('submit', (e) => {
         name: el.name,
         value: window.redactValue(el, el.value).redacted ? undefined : el.value
       }));
+
+    const fieldsData = fields
+      .map(f => `${f.name}=${f.value ?? ""}`)
+      .join(", ");
+
     const payload = {
       formSelector: window.shortSelector(form),
       action: form.action,
       method: form.method,
-      fields,
+      fieldsData,
       title: document.title,
       pageHeader: document.querySelector('h1')?.innerText || document.querySelector('header')?.innerText || ''
     };
@@ -174,9 +179,11 @@ window.addEventListener('submit', (e) => {
 
 // Clipboard events
 ['copy', 'paste', 'cut'].forEach(evt => {
-  window.addEventListener(evt, (e) => {
+  window.addEventListener(evt, async (e) => {
+    const text = await navigator.clipboard.readText();
     const payload = {
       url: location.href,
+      text:text,
       title: document.title,
       target: window.shortSelector(e.target),
       pageHeader: document.querySelector('h1')?.innerText || document.querySelector('header')?.innerText || ''
@@ -214,18 +221,18 @@ window.addEventListener('resize', () => {
   send('window_resize', payload);
 });
 
-let lastScrollY = window.scrollY;
-window.addEventListener('scroll', () => {
-  if (Math.abs(window.scrollY - lastScrollY) > 100) {
-    lastScrollY = window.scrollY;
-    const payload = {
-      scrollY: window.scrollY,
-      title: document.title
-    };
-    console.log('[Content] Scroll event:', payload);
-    send('scroll', payload);
-  }
-}, true);
+// let lastScrollY = window.scrollY;
+// window.addEventListener('scroll', () => {
+//   if (Math.abs(window.scrollY - lastScrollY) > 100) {
+//     lastScrollY = window.scrollY;
+//     const payload = {
+//       scrollY: window.scrollY,
+//       title: document.title
+//     };
+//     console.log('[Content] Scroll event:', payload);
+//     send('scroll', payload);
+//   }
+// }, true);
 
 let lastFocusedElement = null;
 
