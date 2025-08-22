@@ -39,19 +39,19 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
 });
 
 // Listen for window focus changes
-// chrome.windows.onFocusChanged.addListener(async windowId => {
-//   if (windowId === chrome.windows.WINDOW_ID_NONE) return;
-//   const windows = await chrome.windows.getAll({ populate: true });
-//   const win = windows.find(w => w.id === windowId);
-//   const payload = {
-//     ts: nowIso(),
-//     event: 'window_focus_changed',
-//     winId: windowId,
-//     tabCount: win ? win.tabs.length : undefined
-//   };
-//   console.log('[Background] Window focus changed:', payload);
-//   appendLog(payload);
-// });
+chrome.windows.onFocusChanged.addListener(async windowId => {
+  if (windowId === chrome.windows.WINDOW_ID_NONE) return;
+  const windows = await chrome.windows.getAll({ populate: true });
+  const win = windows.find(w => w.id === windowId);
+  const payload = {
+    ts: nowIso(),
+    event: 'window_focus_changed',
+    winId: windowId,
+    tabCount: win ? win.tabs.length : undefined
+  };
+  console.log('[Background] Window focus changed:', payload);
+  appendLog(payload);
+});
 
 // Listen for tab updates (navigation, loading, completed)
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
